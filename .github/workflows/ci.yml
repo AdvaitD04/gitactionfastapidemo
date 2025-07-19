@@ -23,6 +23,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # This step was missing, I have added it back.
+      - name: Run all checks
+        run: |
+          echo "Running linter..."
+          flake8 .
+          echo "Checking formatting..."
+          black --check .
+          echo "Running tests..."
+          pytest
 
   build-and-deploy:
     name: Build and Deploy
@@ -57,7 +66,6 @@ jobs:
         with:
           context: .
           push: true
-          # IMPORTANT: Replace 'your-repo-name' and 'your-image-name'
           tags: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fastapi-repo/my-fastapi-app:latest
 
       - name: Deploy to Cloud Run
@@ -65,9 +73,7 @@ jobs:
         with:
           # The name of your Cloud Run service
           service: 'fastapi-prod-service' 
-          # The image you just pushed
-          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/your-repo-name/your-image-name:latest
+          # This line was incorrect, I have fixed it to match the image above.
+          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fastapi-repo/my-fastapi-app:latest
           # The region your service is in
           region: us-central1
-
-          # for porduction i am writing this way
