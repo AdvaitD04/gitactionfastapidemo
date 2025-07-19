@@ -64,7 +64,7 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           # The name of your Cloud Run service
-          service: 'fastapi-prod-service' 
+          service: 'my-fastapi-app' 
           # This line was incorrect, I have fixed it to match the image above.
           image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fastapi-repo/my-fastapi-app:latest
           # The region your service is in
