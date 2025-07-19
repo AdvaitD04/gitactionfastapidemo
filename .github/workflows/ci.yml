@@ -58,7 +58,7 @@ jobs:
           context: .
           push: true
           # IMPORTANT: Replace 'your-repo-name' and 'your-image-name'
-          tags: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/your-repo-name/your-image-name:latest
+          tags: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fastapi-repo/my-fastapi-app:latest
 
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v2'
