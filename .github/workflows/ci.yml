@@ -1,0 +1,78 @@
+name: Backend CI/CD to Google Cloud
+
+on:
+  push:
+    branches: [ "main", "production" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-lint:
+    name: Test, Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run linter and formatter
+        run: |
+          flake8 .
+          black --check .
+          
+      - name: Run tests with pytest
+        run: pytest
+
+  build-and-deploy:
+    name: Build and Deploy
+    # This job only runs on a push to the 'production' branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/production'
+    needs: test-and-lint
+    runs-on: ubuntu-latest
+    
+    # Add permissions for the job to get a Google Cloud token
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # Replace 'your-repo-name' and 'your-image-name'
+          tags: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/your-repo-name/your-image-name:latest
+
+      - name: Deploy to Cloud Run
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          # The name of your Cloud Run service
+          service: 'fastapi-prod-service' 
+          # The image you just pushed
+          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/your-repo-name/your-image-name:latest
+          # The region your service is in
+          region: us-central1
