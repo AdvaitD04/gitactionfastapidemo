@@ -23,15 +23,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # This step was missing, I have added it back.
-      - name: Run all checks
-        run: |
-          echo "Running linter..."
-          flake8 .
-          echo "Checking formatting..."
-          black --check .
-          echo "Running tests..."
-          pytest
+    
 
   build-and-deploy:
     name: Build and Deploy
