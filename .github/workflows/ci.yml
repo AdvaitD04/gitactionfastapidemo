@@ -69,3 +69,5 @@ jobs:
           image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/your-repo-name/your-image-name:latest
           # The region your service is in
           region: us-central1
+
+          # for porduction i am writing this way
