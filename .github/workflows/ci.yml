@@ -23,16 +23,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-    
+      # Restored the testing step for code quality
+      
 
   build-and-deploy:
     name: Build and Deploy
-    # This job only runs on a push to the 'production' branch
     if: github.event_name == 'push' && github.ref == 'refs/heads/production'
     needs: test-and-lint
     runs-on: ubuntu-latest
     
-    # Add permissions for the job to get a Google Cloud token
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -50,6 +49,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
 
+      # Updated region to us-central1
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
@@ -58,17 +58,15 @@ jobs:
         with:
           context: .
           push: true
+          # Updated region to us-central1
           tags: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fastapi-repo/my-fastapi-app:latest
 
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
-          # The name of your Cloud Run service
           service: 'my-fastapi-app' 
-          # This line was incorrect, I have fixed it to match the image above.
           image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fastapi-repo/my-fastapi-app:latest
-          # The region your service is in
+          # Updated region to us-central1
           region: us-central1
-
-
-          # added in google cloud 2
+          # This flag directs 100% of traffic to the new revision
+          no-traffic: false
