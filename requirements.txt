@@ -1,0 +1,9 @@
+# requirements.txt
+fastapi
+uvicorn
+
+# Testing & Linting
+pytest
+requests
+flake8
+black
