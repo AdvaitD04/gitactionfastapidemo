@@ -69,3 +69,6 @@ jobs:
           image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fastapi-repo/my-fastapi-app:latest
           # The region your service is in
           region: us-central1
+
+
+          # added in google cloud 2
