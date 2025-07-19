@@ -23,13 +23,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run linter and formatter
+      - name: Run all checks
         run: |
+          echo "Running linter..."
           flake8 .
+          echo "Checking formatting..."
           black --check .
-          
-      - name: Run tests with pytest
-        run: pytest
+          echo "Running tests..."
+          pytest
 
   build-and-deploy:
     name: Build and Deploy
@@ -64,7 +65,7 @@ jobs:
         with:
           context: .
           push: true
-          # Replace 'your-repo-name' and 'your-image-name'
+          # IMPORTANT: Replace 'your-repo-name' and 'your-image-name'
           tags: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/your-repo-name/your-image-name:latest
 
       - name: Deploy to Cloud Run
